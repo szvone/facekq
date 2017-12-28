@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>考勤管理</title>
+      <meta charset="utf-8">
+	  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	  <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+      <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+      <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+		<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+      <!--[if lt IE 9]>
+         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+         <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+      <![endif]-->
+        <link rel="stylesheet" href="layui/css/layui.css"  media="all">
+
+		<style>
+        #rollCon{width: 80%;text-align: center;display: block;overflow: hidden;color: black;height: 60%;position: absolute;left: 10%;}
+        #rollSubject{height: auto;}
+        #rollCopy{height: auto;}
+    	</style>
+  </head>
+  <body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#" id="username">后台管理</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="kqlist.html">考勤列表</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+	<br><br><br><br>
+    <div class="container-fluid">
+    <div class="row col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading text-center">
+          <h2>考勤管理</h2>
+        </div>
+        <div class="panel-body">
+          <button class="btn btn-primary pull-right" onclick="add()">添加考勤</button>
+            <br><br>
+            <hr>
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+        </div>
+
+      </div>
+    </div>
+
+	
+    </div>
+
+ 
+
+<script src="layui/layui.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script type="text/html" id="datetotime">
+    {{# var time = format(d.starttime)  }}
+    {{=time }}
+</script>
+<script>
+    function add0(m){return m<10?'0'+m:m }
+    function format(shijianchuo)
+    {
+        var time = new Date(parseInt(shijianchuo));
+        var y = time.getFullYear();
+        var m = time.getMonth()+1;
+        var d = time.getDate();
+        var h = time.getHours();
+        var mm = time.getMinutes();
+        var s = time.getSeconds();
+        return y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);
+    }
+var myTable;
+layui.use('table', function(){
+  var table = layui.table;
+layer.msg('数据加载中', {
+  icon: 16
+  ,shade: 0.01
+});
+
+  myTable = table.render({
+    elem: '#test'
+    ,url:'api/getKqlist1'
+    ,cellMinWidth: 80
+    ,cols: [[
+      {field:'name', title: '考勤名称' }
+      ,{field:'cname', title: '班级', sort: true}
+      ,{field:'starttime', title: '开始时间', sort: true,templet:"#datetotime"}
+      ,{field:'sum', title: '已考勤人数', sort: true}
+      ,{title: '操作', toolbar: '#barDemo',minWidth: 150}
+      ]]
+    ,done:function(){
+      layer.closeAll();
+    }
+  });
+
+    //监听工具条
+    table.on('tool(test)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'del'){
+            layer.confirm('真的删除行么', function(index){
+                obj.del();
+                layer.close(index);
+                $.post("api/delKq","id="+data.id,function (data) {
+                    console.log(data)
+
+                });
+            });
+        } else if(obj.event === 'ck'){
+            //layer.alert('编辑行：<br>'+ JSON.stringify(data))
+            //edit(JSON.stringify(data));
+            var index = layer.open({
+                title:"考勤记录",
+                type: 2,
+                content: 'kqinfo.html?id='+data.id,
+                area: ['80%', '80%'],
+                maxmin: true
+            });
+        }
+
+
+
+    });
+
+
+});
+
+
+
+
+function add() {
+    $("#addUserMod").modal('show');
+}
+function addsave() {
+    var name = $("#name").val();
+    var classid = $("#classid").val();
+
+    if (name!="" && classid !=""){
+        layer.msg('操作中', {
+            icon: 16
+            ,shade: 0.01
+          });
+        $.post("api/addKq","name="+name+"&classid="+classid,function (data) {
+            console.log(data);
+            layer.closeAll();
+            if (data=="1"){
+                layer.msg("开始成功",{time: 1500});
+                $("#addUserMod").modal('hide');
+                myTable.reload();
+            }else{
+                layer.msg("添加失败",{icon: 5,time: 1500,anim: 6})
+            }
+        })
+    }else{
+        layer.msg("请填写完整",{icon: 5,time: 1500,anim: 6})
+    }
+}
+
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-xs" lay-event="ck">查看</a>
+</script>
+
+
+
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="addUserMod" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title text-center" id="addshop1">添加考勤</h4>
+            </div>
+            <div class="modal-body">
+                考勤名：<br>
+                <p><input type="text" class="form-control" placeholder="考勤名" id="name"></p>
+                <br>
+                考勤班级：<br>
+                <p><select id="classid" class="form-control"></select></p>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="addsave()">开始考勤</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<script>
+$.post("api/getAllClass",function(data){
+    for(var i = 0;i<data.length;i++){
+        document.getElementById('classid').innerHTML+="<option value='"+data[i].id+"'>"+data[i].name+"</option>"
+    }
+});
+</script>
+<hr class="featurette-divider">
+
+			<!-- /END THE FEATURETTES -->
+
+			<!-- FOOTER -->
+			<footer class="text-center">
+				
+				<p>	Copyright©&nbsp;2017 &nbsp;by &nbsp;vone
+				</p>
+
+			</footer>
+
+
+
+</body>
+</html>

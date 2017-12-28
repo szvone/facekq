@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title>个人中心</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <link rel="stylesheet" href="https://cdn.bootcss.com/amazeui/2.7.2/css/amazeui.min.css"/>
+  <style>
+    .header {
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 200%;
+      color: #333;
+      margin-top: 30px;
+    }
+    .header p {
+      font-size: 14px;
+    }
+    #photo{ 
+      margin:10px auto
+    } 
+    #photo img{ 
+      border-radius:50%
+    }
+    body{ text-align:center} 
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="am-g">
+    <h1>个人中心</h1>
+  </div>
+</div>
+<div class="am-g">
+  <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
+    <hr>
+
+    <form class="am-form">
+      <center>
+      <div id="photo">
+        <label><img id="img" src="" height="140px" width="140px"></label>
+      </div>
+      <br>
+
+      <label>姓名:&nbsp&nbsp<span id="name"></span></label>
+      <br>
+
+      <label>学号:&nbsp&nbsp<span id="stuno"></span></label>
+      <br>
+
+      <label>班级:&nbsp&nbsp<span id="classname"></span></label>
+      <br>
+      </center>
+
+      <br>
+
+      <div style="margin:0 auto;">
+        <a href="edit.html"><input type="button" value="修改信息"></a>
+      </div>
+      <br>
+      <div style="margin:0 auto;">
+        <a href="facetoken.html"><input type="button" value="录入面部"></a>
+      </div>
+      <br>
+      <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+      <script>
+        $.post("api/getUserInfo",function(data){
+            $("#name").html(data.name);
+            $("#stuno").html(data.stuno);
+            document.getElementById("img").src=data.faceimg;
+            $("#classname").html(data.classname);
+
+        });
+
+      </script>
+    </form>
+  </div>
+</div>
+</body>
+</html>

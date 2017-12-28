@@ -1,0 +1,28 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.szvone.dao.TeacherDAO">
+
+
+
+
+    <insert id="addTeacher" parameterType="Teacher">
+        INSERT INTO `teacher`
+          (`id`, `user`, `pass`)
+        VALUES
+          (#{id}, #{user}, #{pass});
+    </insert>
+
+    <select id="queryByUser" resultType="Teacher">
+        SELECT *
+        from teacher
+        where
+        user = #{user}
+        ORDER BY id DESC
+        ;
+    </select>
+
+
+
+</mapper>

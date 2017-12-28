@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="facekq:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="facekq.war">
+      <element id="artifact" artifact-name="facekq:war exploded" />
+    </root>
+  </artifact>
+</component>

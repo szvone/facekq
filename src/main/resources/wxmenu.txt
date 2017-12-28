@@ -1,0 +1,24 @@
+{
+    "button": [
+        {
+            "type": "view",
+            "name": "开始考勤",
+            "url": "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx69f746dd9e0b7d40&redirect_uri=http://face.szvone.cn/facekq/api/shouquan?url=list.html&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+        },
+        {
+            "name": "菜单",
+            "sub_button": [
+                {
+                    "type": "view",
+                    "name": "个人中心",
+                    "url": "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx69f746dd9e0b7d40&redirect_uri=http://face.szvone.cn/facekq/api/shouquan?url=userinfo.html&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+                },
+                {
+                    "type": "click",
+                    "name": "赞一下我们",
+                    "key": "V1001_GOOD"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,66 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.szvone.dao.KqinfoDAO">
+
+
+    <!--<select id="queryAll" resultType="Km">-->
+        <!--SELECT *-->
+        <!--from km-->
+        <!--WHERE 1=1-->
+        <!--<if test="type!=-1">-->
+            <!--and type=#{type}-->
+        <!--</if>-->
+
+        <!--<if test="shopname!=null and !&quot;&quot;.equals(shopname.trim())">-->
+            <!--and shopname LIKE '%' #{shopname} '%'-->
+        <!--</if>-->
+
+        <!--<if test="updata!=null and !&quot;&quot;.equals(updata.trim())">-->
+            <!--and updata LIKE '%' #{updata} '%'-->
+        <!--</if>-->
+
+        <!--<if test="start!=null and end!=null">-->
+            <!--and updata_time>=#{start} and updata_time &lt;=#{end}-->
+        <!--</if>-->
+
+        <!--ORDER BY yxj DESC,id DESC-->
+        <!--limit #{offset},#{limit};-->
+    <!--</select>-->
+
+    <insert id="Kq" parameterType="Kqinfo">
+        INSERT ignore INTO `kqinfo`
+        (`id`, `kqid`, `classid`, `classname`, `studentid`, `studentname`, `time`, `address`, `faceimg`, `xsd`)
+        VALUES
+        (#{id}, #{kqid}, #{classid}, #{classname}, #{studentid}, #{studentname}, #{time}, #{address}, #{faceimg}, #{xsd});
+    </insert>
+
+    <select id="queryByKqId" resultType="Kqinfo">
+        SELECT *
+        from kqinfo
+        where
+        kqid = #{id}
+        ORDER BY id DESC
+        ;
+    </select>
+
+    <select id="queryByStudentId" resultType="Kqinfo">
+        SELECT *
+        from kqinfo
+        where
+        studentid = #{id}
+        ORDER BY id DESC
+        ;
+    </select>
+
+    <select id="queryByClassId" resultType="Kqinfo">
+        SELECT *
+        from kqinfo
+        where
+        classid = #{id}
+        ORDER BY id DESC
+        ;
+    </select>
+
+</mapper>

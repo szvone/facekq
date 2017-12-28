@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/layer/3.1.0/layer.js"></script>
+    <title>开始考勤</title>
+</head>
+<body>
+<center>
+    <h2>请点击按钮拍照登记面部</h2>
+    <hr />
+    <p><img id="img1" width="100%" height="100%"></p>
+    <p>
+        <button onclick="getcam()">点此拍照</button>
+    </p>
+    <p>
+        <button onclick="check()">提交考勤</button>
+    </p>
+
+
+
+    <script type="text/javascript">
+        layer.msg('定位中', {
+            icon: 16
+            ,shade: 0.01
+            ,time:0
+        });
+
+        var gps="";
+
+
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+        var imgid = "";
+
+        function check() {
+            if(gps==""){
+                layer.msg("获取定位信息失败，请允许网页获取定位信息！");
+                setTimeout(function () {
+                    window.location.href="kq.html?id="+getQueryString("id");
+                },2000);
+                return;
+            }
+            if(imgid==""){
+                layer.msg("请先拍照！");
+                return;
+            }
+
+            layer.msg('考勤中', {
+                icon: 16
+                ,shade: 0.01
+                ,time:0
+            });
+            var data = "mid="+imgid+"&gps="+gps+"&id="+getQueryString("id");
+            $.post("api/kq",data,function(data){
+                layer.closeAll();
+                if(data=="1"){
+                    layer.msg("考勤成功！");
+                    setTimeout(function () {
+                        window.location.href="list.html";
+                    },2000);
+
+                }else{
+                    layer.msg("考勤失败,脸部不匹配,请重新拍照上传");
+                    setTimeout(function () {
+                        window.location.href="kq.html?id="+getQueryString("id");
+                    },2000);
+                }
+            });
+        }
+
+
+
+
+        function getcam() {
+
+            if(gps==""){
+                layer.msg("获取定位信息失败，请允许网页获取定位信息！");
+                setTimeout(function () {
+                    window.location.href="kq.html?id="+getQueryString("id");
+                },2000);
+                return;
+            }
+
+            wx.chooseImage({
+                count: 1, // 默认9
+                sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                sourceType: ['camera'], // 可以指定来源是相册还是相机，默认二者都有
+                success: function (res) {
+                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                    //alert(localIds);
+
+
+
+                    //必须做一下mediaId的设定，否则将会无法在安卓端得到微信上传功能的触发
+                    localId = localIds.toString();
+                    //在成功选择图片或拍照的时候 可以触发上传图片,
+                    wx.uploadImage({
+                        localId: localId, // 需要上传的图片的本地ID，由chooseImage接口获得
+                        isShowProgressTips: 1, // 默认为1，显示进度提示
+
+                        success: function (res) {
+                            var serverId = res.serverId; // 返回图片的服务器端ID 4HY4_D5p8ZcBIeVPKUIkvWBd7OlNr_f2TVPAs32xnb5oZQDugO1qPYoz-7Jpc095
+                            //当成功从微信服务端返回 serverid 上传到php自己服务器上
+                            //alert(serverId);
+
+                            layer.msg('面部检测中', {
+                                icon: 16
+                                ,shade: 0.01
+                                ,time:0
+                            });
+                            $.post("api/checkface","mid="+serverId,function(data){
+                                layer.closeAll();
+                                if(data!="error"){
+
+                                    imgid=serverId;
+                                    document.getElementById("img1").src = localIds;
+                                    layer.msg("面部检测成功")
+                                    //alert("成功");
+                                    //window.location.href="userinfo.html";
+                                }else{
+                                    layer.msg("面部检测失败,请重新拍照上传");
+                                    //window.location.href="facetoken.html";
+                                }
+                            });
+
+                        },
+                        fail: function (res) {
+                            alert(res.errMsg);
+                            // alert(JSON.stringify(res))
+                        }
+                    });
+
+
+                }
+            });
+        }
+
+
+
+
+    </script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script>
+        //alert();
+        $.post("api/getWxToken?url=" + window.location.href, function (data) {
+            var json = JSON.parse(data);
+            wx.config({
+                debug: false,
+                appId: json.appId,
+                timestamp: json.timestamp,
+                nonceStr: json.nonceStr,
+                signature: json.signature,
+                jsApiList: [
+                    'chooseImage', 'uploadImage'
+                ]
+            });
+
+            setTimeout(getgps,2000);
+
+        });
+
+
+        function getgps() {
+
+            wx.getLocation({
+                type: 'gcj02', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                success: function (res) {
+                    var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+                    var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+                    var speed = res.speed; // 速度，以米/每秒计
+                    var accuracy = res.accuracy; // 位置精度
+                    gps = longitude+","+latitude;
+                    layer.closeAll();
+                    layer.msg("定位成功，请拍照考勤！");
+                    //alert(latitude + "-" + longitude + "-" + speed + "-" + accuracy);
+
+                }
+            });
+        }
+
+
+
+    </script>
+
+</center>
+</body>
+</html>

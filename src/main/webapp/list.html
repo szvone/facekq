@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>考勤系统</title>
+    <meta http-equiv="x-dns-prefetch-control" content="on"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta content="telephone=no" name="format-detection"/>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<br><br>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">考勤系统</a>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+
+
+    <br>
+
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading text-center">
+                    <h4>考勤列表</h4>
+                </div>
+                <div class="panel-body" id="">
+
+                    <br>
+                    <div id="datalist"></div>
+
+
+                    <!--<div class="panel panel-default">-->
+                        <!--<div class="panel-body text-center" onclick="nextpage()">-->
+                            <!--点击加载下一页-->
+                        <!--</div>-->
+                    <!--</div>-->
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1"></div>
+
+    <script type="text/javascript">
+        function dodo(id) {
+            //alert("查看内容功能待更新");
+            window.open("kq.html?id=" + id)
+        }
+
+        function getCookie(name)
+        {
+            var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+            return (arr=document.cookie.match(reg))?unescape(arr[2]):null;
+        }
+
+        function getdata() {
+            $.post("api/getKqlist" , function (data) {
+                //var obj = JSON.parse(data);
+                var obj = data;
+                console.log(obj)
+                for (var i = 0; i < obj.length; i++) {
+                    var id = obj[i].id;
+                    var stus = obj[i].stus;
+                    var uid = "["+getCookie("userid")+"]";
+                    console.log(stus+"-"+uid);
+                    console.log(stus.indexOf(uid));
+                    if (stus.indexOf(uid)!=-1){
+                        var name ="<span style='color:green'>"+obj[i].name+" - 已考勤</span>" ;
+                        var clk = "alert('已经考勤过了哦！')";
+                    }else{
+                        var name ="<span style='color:red'>"+obj[i].name+" - 未考勤</span>" ;
+                        var clk = "dodo('" + id + "')";
+                    }
+
+
+                    var out = '<div class="panel panel-default" onclick="'+clk+'">';
+                    out += '<div class="panel-heading">';
+                    out += ' <h3 class="panel-title">';
+                    out += name;
+                    out += '</h3>';
+                    out += '</div>';
+                    out += '<div class="panel-body">';
+                    out += '<div class="col-md-3">';
+                    out += '时间：' + new Date(obj[i].starttime).toLocaleString();
+                    out += '</div> ';
+                    out += '<div class="col-md-3">';
+                    out += '教师:' + obj[i].teachername;
+                    out += '</div> ';
+                    out += '<div class="col-md-3">';
+                    out += '已考勤人数：' + obj[i].sum;
+                    out += '</div>';
+                    out += '</div>';
+                    out += '</div>';
+                    document.getElementById('datalist').innerHTML += out;
+                }
+            });
+
+
+        }
+
+        getdata();
+    </script>
+
+
+</body>
+</html>
